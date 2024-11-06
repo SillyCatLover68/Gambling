@@ -1,10 +1,11 @@
 import random
+import time  
 
-MAX_LINES = 6
+MAX_LINES = 3
 MAX_BET = 1000000000000
 MIN_BET = 1
 
-ROWS = 6
+ROWS = 3
 COLS = 3
 
 symbol_count = {
@@ -16,11 +17,10 @@ symbol_count = {
 
 symbol_value = {
     ":3": 12,
-    ":$": 10,
+    "$": 10,
     ":/": 5,
     ":>": 4
 }
-
 
 def check_winnings(columns, lines, bet, values):
     winnings = 0
@@ -36,7 +36,6 @@ def check_winnings(columns, lines, bet, values):
             winnings_lines.append(line + 1)
 
     return winnings, winnings_lines
-
 
 def get_slot_machine_spin(rows, cols, symbols):
     all_symbols = []
@@ -57,17 +56,20 @@ def get_slot_machine_spin(rows, cols, symbols):
 
     return columns
 
+def print_slot_machine(columns, spin_delay=0.1, final_delay=0.5):
+    for _ in range(10):  
+        for row in range(len(columns[0])):
+            spin_row = " | ".join(random.choice(list(symbol_count.keys())) for _ in columns)
+            print(f"\r{spin_row}", end="")  
+            time.sleep(spin_delay)
+        print("\r", end="")  
 
-def print_slot_machine(columns):
+    time.sleep(final_delay)
     for row in range(len(columns[0])):
-        for i, column in enumerate(columns):
-            if i != len(columns) - 1:
-                print(column[row], end=" | ")
-            else:
-                print(column[row], end="")
-
-        print()
-
+        final_row = " | ".join(column[row] for column in columns)
+        print(f"\r{final_row}", end="")  
+        time.sleep(0.3)  
+        print() 
 
 def deposit():
     while True:
@@ -83,7 +85,6 @@ def deposit():
 
     return amount
 
-
 def get_number_of_lines():
     while True:
         lines = input(f"Enter the number of lines to bet on (1-{MAX_LINES}): ")
@@ -97,7 +98,6 @@ def get_number_of_lines():
             print("Please enter a valid number.")
 
     return lines
-
 
 def get_bet():
     while True:
@@ -113,7 +113,6 @@ def get_bet():
 
     return amount
 
-
 def spin(balance):
     lines = get_number_of_lines()
     while True:
@@ -125,8 +124,7 @@ def spin(balance):
         else:
             break
 
-    print(
-        f"You are betting ${bet} on {lines} lines. Total bet is equal to: ${total_bet}")
+    print(f"You are betting ${bet} on {lines} lines. Total bet is equal to: ${total_bet}")
 
     slots = get_slot_machine_spin(ROWS, COLS, symbol_count)
     print_slot_machine(slots)
@@ -135,17 +133,15 @@ def spin(balance):
     print(f"You won on lines:", *winning_lines)
     return winnings - total_bet
 
-
 def main():
     balance = deposit()
     while True:
         print(f"Current balance is ${balance}")
-        answer = input("Press Enter to play (q to quit)")
+        answer = input("Press Enter to play (q to quit) ")
         if answer == "q":
             break
         balance += spin(balance)
 
-    print(f"You left with {balance}")
-
+    print(f"You left with ${balance}")
 
 main()
